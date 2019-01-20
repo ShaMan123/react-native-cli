@@ -1,11 +1,14 @@
 {
   "name": "my-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "cli",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ShaMan123/my-cli.git"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "pip": "echo lucky boy"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "cli"
@@ -15,10 +18,12 @@
   "dependencies": {
     "chalk": "^2.4.1",
     "clear": "^0.1.0",
+    "commander": "^2.19.0",
     "figlet": "^1.2.1",
-    "minimist": "^1.2.0"
+    "prompt": "^1.0.0",
+    "prompt-sync": "^4.1.6"
   },
   "bin": {
-    "autodidact-cli": "./index.js"
+    "my-cli": "./index.js"
   }
 }

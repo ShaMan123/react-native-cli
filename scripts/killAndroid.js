@@ -7,7 +7,7 @@ const prompt = require('prompt');
 
 //const adb = require('react-native/local-cli/runAndroid/adb');
 
-const cwd = path.dirname(__dirname);
+const cwd = process.cwd();
 const pathToAndroid = getPathToAndroid(cwd);
 /*
 const processConfig = { stdio: 'inherit', cwd };

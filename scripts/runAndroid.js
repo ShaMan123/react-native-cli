@@ -5,29 +5,35 @@ const path = require('path');
 const fs = require('fs');
 
 const pathToAndroid = getPathToAndroid(process.cwd());
-const processConfig = { stdio: 'inherit', cwd: pathToAndroid };
 const isWindows = os.platform() === 'win32';
 
-const args = require('minimist')(process.argv.slice(2), {
-    boolean: true,
-    default: {
-        build: true,
-        app: 'com.autodidactrn'
+function runAndroid(shouldInstallBuild = true) {
+    let app, packager, adbDevices, launchAppTask;
+    try {
+        packager = child_process.exec(`node ${path.join(__dirname, 'launchPackager')}`, {
+            stdio: isWindows ? 'ignore' : 'inherit',
+            cwd: path.join(pathToAndroid, '..'),
+            detached: true
+        });
+        
+        adbDevices = child_process.execSync('node ./adbForDeviceEmulator', { stdio: 'inherit', cwd: __dirname });
+        if (shouldInstallBuild) app = child_process.execSync('gradlew app:assembleDebug && gradlew installDebug', { stdio: 'inherit', cwd: pathToAndroid });
+        launchAppTask = launchApp();
     }
-});
-
-try {
-    let app;
-    const adbDevices = child_process.execSync('node ./adbForDeviceEmulator', { stdio: 'inherit', cwd: __dirname });
-    if (args.build) app = child_process.execSync('gradlew app:assembleDebug && gradlew installDebug', { stdio: 'inherit', cwd: pathToAndroid });
-    const launchAppTask = launchApp(args.app);
-    console.log(chalk.yellow(`node ${process.argv[1]}`));
+    catch (err) {
+        console.log('exiting...');
+        killDetachedProcess(packager);
+        process.exit(1);
+    }
 }
-catch (err) {
-    console.log('exiting...');
-    console.log(chalk.yellow(`node ${process.argv[1]}`));
-    process.exit(1);
-    packager.kill();
+
+function killDetachedProcess(subProcess) {
+    try {
+        process.kill(-subProcess.pid, 'SIGINT');
+    }
+    catch (err) {
+        return;
+    }
 }
 
 function getPathToAndroid(cwd) {
@@ -45,18 +51,31 @@ function getPathToAndroid(cwd) {
     }
 }
 
-function launchPackager() {
-    const packagerConfig = { cwd: pathToAndroid, detached: true };
-    //if (isWindows) packagerConfig.stdio = 'ignore';
-    return child_process.exec('node ./launchPackager', { stdio: 'inherit', cwd: __dirname });
+function getPackageNameWithSuffix(appId, appIdSuffix) {
+    const packageName = fs
+        .readFileSync(`${pathToAndroid}/app/src/main/AndroidManifest.xml`, 'utf8')
+        .match(/package="(.+?)"/)[1];
+
+    if (appId) {
+        return appId;
+    } else if (appIdSuffix) {
+        return packageName + '.' + appIdSuffix;
+    }
+    else {
+        return packageName;
+    }
 }
 
-function launchApp(appName) {
+function launchApp() {
+    const packageName = fs
+        .readFileSync(`${pathToAndroid}/app/src/main/AndroidManifest.xml`, 'utf8')
+        .match(/package="(.+?)"/)[1];
     const adbPath = path.resolve(process.env.ANDROID_HOME, 'platform-tools', 'adb');
-    const packager = launchPackager();
-    const adbArgs = ['shell', 'am', 'start', '-n', `${appName}/${appName}.MainActivity`];
-    const launchApp = child_process.spawnSync(adbPath, adbArgs, { stdio: 'inherit', cwd: pathToAndroid });
+    const adbArgs = ['shell', 'am', 'start', '-n', `${packageName}/${packageName}.MainActivity`];
+    return child_process.spawnSync(adbPath, adbArgs, { stdio: 'inherit', cwd: pathToAndroid });
 }
+
+module.exports = runAndroid;
 
 
 

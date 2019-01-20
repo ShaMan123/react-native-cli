@@ -6,11 +6,12 @@ const path = require('path');
 const isWindows = os.platform() === 'win32';
 const adbPath = path.join(process.env.ANDROID_HOME, '/platform-tools/adb');
 
-console.log(chalk.yellow('For more information: https://developer.android.com/studio/command-line/adb'));
-tryRunAdbReverse('8081');
-getDeviceList();
 
-function tryRunAdbReverse(packagerPort, device) {
+function logHelp() {
+    console.log(chalk.yellow('For more information: https://developer.android.com/studio/command-line/adb'));
+}
+
+function tryRunAdbReverse(packagerPort = '8081', device) {
     try {
 
         const adbArgs = ['reverse', `tcp:${packagerPort}`, `tcp:${packagerPort}`];
@@ -78,4 +79,10 @@ function getDevices() {
     } catch (e) {
         return [];
     }
+}
+
+module.exports = {
+    tryRunAdbReverse,
+    getDevices,
+    logHelp
 }

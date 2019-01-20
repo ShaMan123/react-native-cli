@@ -6,8 +6,8 @@ const fs = require('fs');
 
 const isWindows = os.platform() === 'win32';
 const fileName = isWindows ? 'launchPackager.bat' : 'launchPackager.command';
-const dir = path.parse(__dirname).dir;
-const pathToRNScripts = path.join(dir, 'node_modules/react-native/scripts');
+
+const pathToRNScripts = path.join(process.cwd(), 'node_modules/react-native/scripts');
 const pathToScript = path.join(pathToRNScripts, fileName);
 
 startServerInNewWindow(8081);
