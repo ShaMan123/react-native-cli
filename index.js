@@ -79,7 +79,9 @@ program
     .description('launchs react-native package bundler from cwd')
     .option('-B, --build', 'build the app')
     .action(function (cmd, options) {
-        require('./scripts/runAndroid')(options.build ? true : false);
+        const buildFlag = options.parent.rawArgs.find((cmd) => cmd.match('^(-B|--build)'));
+        const buildArg = buildFlag && buildFlag.split('=')[1] && buildFlag.split('=')[1] === 'false' ? false : true;
+        require('./scripts/runAndroid')(buildArg);
     });
 
 program.on('command:*',errorMessage);
