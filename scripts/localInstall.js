@@ -49,12 +49,27 @@ function install(modules, callback) {
         .stdout.on('message', (m) => console.log(m));
 }
 
+function deleteFolderRecursive(folderPath) {
+    if (fs.existsSync(folderPath)) {
+        fs.readdirSync(folderPath).forEach(function (file, index) {
+            var curPath = path.resolve(folderPath, file);
+            if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                deleteFolderRecursive(curPath);
+            } else { // delete file
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.rmdirSync(folderPath);
+    }
+};
+
 function removeLoopedFolder() {
     const exampleAppName = require(path.resolve(process.cwd(), './package.json')).name;
     const repoName = require(path.resolve(process.cwd(), '../package.json')).name;
 
-    const pathToLoop = path.resolve(process.cwd(), exampleAppName, 'node_modules', repoName, exampleAppName);
-    fs.rmdirSync(pathToLoop);
+    const pathToLoop = path.resolve(process.cwd(), 'node_modules', repoName, exampleAppName);
+    console.log(pathToLoop)
+    deleteFolderRecursive(pathToLoop);
 }
 
 function localInstall() {
@@ -66,4 +81,4 @@ function localInstall() {
     }
 }
 
-module.exports = localInstall;
+module.exports = { localInstall, removeLoopedFolder };
