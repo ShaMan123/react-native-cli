@@ -45,7 +45,8 @@ function install(modules, callback) {
             else {
                 install(modules, callback);
             }
-        });
+        })
+        .stdout.on('message', (m) => console.log(m));
 }
 
 function removeLoopedFolder() {
@@ -53,8 +54,7 @@ function removeLoopedFolder() {
     const repoName = require(path.resolve(process.cwd(), '../package.json')).name;
 
     const pathToLoop = path.resolve(process.cwd(), exampleAppName, 'node_modules', repoName, exampleAppName);
-    console.log(pathToLoop);
-        //fs.rmdirSync()
+    fs.rmdirSync(pathToLoop);
 }
 
 function localInstall() {
@@ -65,7 +65,5 @@ function localInstall() {
         console.error(err);
     }
 }
-
-localInstall()
 
 module.exports = localInstall;

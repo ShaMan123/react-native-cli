@@ -74,6 +74,14 @@ program
     });
 
 program
+    .command('local-install')
+    .alias('localInstall')
+    .description('Installs the parent package in the cwd, cwd must be the direct child of package')
+    .action(function (cmd, options) {
+        require('./scripts/localInstall')();
+    });
+
+program
     .command('runAndroid [options]')
     .alias('run-android [options]')
     .description('launchs react-native package bundler from cwd')
