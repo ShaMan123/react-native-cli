@@ -6,7 +6,7 @@ const fs = require('fs');
 const prompt = require('prompt-sync')();
 
 function getCmd() {
-    let npm = fs.existsSync(path.resolve(process.cwd(), './package-lock.json')) || fs.existsSync(path.resolve(process.cwd(), '../package-lock.json'))
+    let npm = fs.existsSync(path.resolve(process.cwd(), './package-lock.json')) || fs.existsSync(path.resolve(process.cwd(), '../package-lock.json'));
     let yarn = fs.existsSync(path.resolve(process.cwd(), './yarn.lock')) || fs.existsSync(path.resolve(process.cwd(), '../yarn.lock'));
 
     if (npm && yarn) {
@@ -27,26 +27,11 @@ function getInstallCmd() {
     return `${repoName}@file:..`;
 }
 
-function install(modules, callback) {
-    if (modules.length === 0) {
-        if (callback) callback(null);
-        return;
-    }
-    var module = modules.shift();
-    child_process.exec(
-        `${getCmd()} ${module}`,
-        {},
-        function (error, stdout, stderr) {
-            process.stdout.write(stdout + '\n');
-            process.stderr.write(stderr + '\n');
-            if (error !== null) {
-                if (callback) callback(error);
-            }
-            else {
-                install(modules, callback);
-            }
-        })
-        .stdout.on('message', (m) => console.log(m));
+function install(module) {
+    return child_process.execSync(`${getCmd()} ${module}`, {
+        cwd: process.cwd(),
+        stdio: [process.stdin, process.stdout, process.stderr]
+    });
 }
 
 function deleteFolderRecursive(folderPath) {
@@ -68,13 +53,13 @@ function removeLoopedFolder() {
     const repoName = require(path.resolve(process.cwd(), '../package.json')).name;
 
     const pathToLoop = path.resolve(process.cwd(), 'node_modules', repoName, exampleAppName);
-    console.log(pathToLoop)
     deleteFolderRecursive(pathToLoop);
 }
 
 function localInstall() {
     try {
-        install([getInstallCmd()], removeLoopedFolder);
+        install(getInstallCmd());
+        removeLoopedFolder();
     }
     catch (err) {
         console.error(err);

@@ -78,7 +78,7 @@ program
     .alias('localInstall')
     .description('Installs the parent package in the cwd, cwd must be the direct child of package')
     .action(function (cmd, options) {
-        require('./scripts/localInstall').removeLoopedFolder();
+        require('./scripts/localInstall').localInstall();
     });
 
 program
