@@ -82,6 +82,15 @@ program
     });
 
 program
+    .command('js2ts')
+    .alias('ts-transform')
+    .description('Copies all javascript files to typescript')
+    .option('--ext <ext>', 'file extension, i.e .ts')
+    .action(function (cmd, options) {
+        require('./scripts/js2ts')(process.cwd(), cmd.ext);
+    });
+
+program
     .command('runAndroid [options]')
     .alias('run-android [options]')
     .description('launchs react-native package bundler from cwd')
