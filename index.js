@@ -1,14 +1,14 @@
 ﻿#!/usr/bin/env node
 
-const chalk       = require('chalk');
-const clear       = require('clear');
-const figlet      = require('figlet');
+const chalk = require('chalk');
+const clear = require('clear');
+const figlet = require('figlet');
 
 clear();
 console.log(
-  chalk.yellow(
-    figlet.textSync('Autodidact', { horizontalLayout: 'full' })
-  )
+    chalk.yellow(
+        figlet.textSync('Autodidact', { horizontalLayout: 'full' })
+    )
 );
 /*
 const args = require('minimist')(process.argv.splice(2));
@@ -37,8 +37,8 @@ program
 program
     .command('adb [options]')
     .option('--list', 'get device list')
-    .option('--port', 'specify port')
-    .option('--device', 'specify device Id')
+    .option('--port <port>', 'specify port')
+    .option('--device <device>', 'specify device Id')
     .description('start adb')
     .action(function (cmd, options) {
         const { getDevices, logHelp, tryRunAdbReverse } = require('./scripts/adbForDeviceEmulator');
@@ -101,7 +101,7 @@ program
         require('./scripts/runAndroid')(buildArg);
     });
 
-program.on('command:*',errorMessage);
+program.on('command:*', errorMessage);
 program.parse(process.argv);
 
 function errorMessage(cmd, exit = true) {
